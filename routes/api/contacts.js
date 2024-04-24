@@ -7,6 +7,7 @@ const {
   listContacts,
   removeContact,
   updateContact,
+  updateStatusContact,
 } = require("../../models/contacts");
 
 const contactSchema = Joi.object({
@@ -16,6 +17,21 @@ const contactSchema = Joi.object({
     tlds: { allow: ["com", "net"] },
   }),
   phone: Joi.string().min(7).max(19).required(),
+  favorite: Joi.boolean(),
+});
+
+const contactShemaUpdate = Joi.object({
+  name: Joi.string().min(3).max(30),
+  email: Joi.string().email({
+    minDomainSegments: 2,
+    tlds: { allow: ["com", "net"] },
+  }),
+  phone: Joi.string().min(7).max(19),
+  favorite: Joi.boolean(),
+});
+
+const favoriteShemaUpdate = Joi.object({
+  favorite: Joi.boolean().required(),
 });
 
 const contactIdSchema = Joi.string()
@@ -81,7 +97,7 @@ router.put("/:contactId", async (req, res, next) => {
       return res.status(400).json({ message: idError.details[0].message });
     }
 
-    const { error: bodyError } = contactSchema.validate(req.body);
+    const { error: bodyError } = contactShemaUpdate.validate(req.body);
     if (bodyError) {
       return res.status(400).json({ message: bodyError.details[0].message });
     }
@@ -93,6 +109,33 @@ router.put("/:contactId", async (req, res, next) => {
     res.json(updatedContact);
   } catch (error) {
     next(error);
+  }
+});
+
+router.patch("/:contactId/favorite", async (req, res) => {
+  try {
+    const { error: idError } = contactIdSchema.validate(req.params.contactId);
+    if (!idError) {
+      return res.status(400).json({ message: idError.details[0].message });
+    }
+
+    const { error, value } = favoriteShemaUpdate.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: "Missing field favorite" });
+    }
+
+    const updatedContact = await updateStatusContact(
+      req.params.contactId,
+      value
+    );
+
+    if (!updatedContact) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.status(200).json(updatedContact);
+  } catch (error) {
+    console.error("Error updating favorite status:", error);
   }
 });
 
