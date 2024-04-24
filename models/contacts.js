@@ -1,11 +1,8 @@
-const fs = require("fs/promises");
-const { nanoid } = require("nanoid");
-const dataFile = "models/contacts.json";
-const data = fs.readFile(dataFile, "utf8");
+const Contact = require("./Contact");
 
 const listContacts = async () => {
   try {
-    return JSON.parse(await data);
+    return await Contact.find();
   } catch (error) {
     console.error("Error reading contacts data:", error);
     return [];
@@ -14,8 +11,7 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   try {
-    const contacts = JSON.parse(await data);
-    return contacts.find((contact) => contact.id === contactId);
+    return await Contact.findById(contactId);
   } catch (error) {
     console.error("Error finding contact by ID:", error);
     return null;
@@ -24,10 +20,7 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   try {
-    let contacts = JSON.parse(await data);
-    contacts = contacts.filter((contact) => contact.id !== contactId);
-    await fs.writeFile(dataFile, JSON.stringify(contacts, null, 2));
-    return contacts;
+    return await Contact.deleteOne({ _id: contactId });
   } catch (error) {
     console.error("Error removing contact:", error);
     return [];
@@ -36,10 +29,7 @@ const removeContact = async (contactId) => {
 
 const addContact = async (body) => {
   try {
-    const data = await listContacts();
-    const newContact = { id: nanoid(), ...body };
-    data.push(newContact);
-    await fs.writeFile(dataFile, JSON.stringify(data, null, 2));
+    const newContact = await new Contact(body);
     return newContact;
   } catch (error) {
     console.error("Error adding new contact:", error);
@@ -49,16 +39,31 @@ const addContact = async (body) => {
 
 const updateContact = async (contactId, body) => {
   try {
-    const data = await listContacts();
-    const index = data.findIndex((contact) => contact.id === contactId);
-    if (index === -1) return null;
-    const updatedContact = { ...data[index], ...body };
-    data[index] = updatedContact;
-    await fs.writeFile(dataFile, JSON.stringify(data, null, 2));
+    const updatedContact = await Contact.findByIdAndUpdate(contactId, body, {
+      new: true,
+    });
     return updatedContact;
   } catch (error) {
     console.error("Error updating contact:", error);
     return null;
+  }
+};
+
+const updateStatusContact = async (contactId, body) => {
+  try {
+    const contact = await Contact.findById(contactId);
+
+    if (!contact) {
+      return null;
+    }
+    contact.favorite = body.favorite;
+
+    const updatedContact = await contact.save();
+
+    return updatedContact;
+  } catch (error) {
+    console.error("Error updating favorite status:", error);
+    throw error;
   }
 };
 
@@ -68,4 +73,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };
