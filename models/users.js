@@ -1,4 +1,4 @@
-const express = require("express");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -48,7 +48,7 @@ const login = async (body) => {
 
 const logout = async (userId) => {
   try {
-    return (result = await User.updateOne({ _id: userId }, { token: null }));
+    return (await User.updateOne({ _id: userId }, { token: null }));
   } catch (error) {
     console.log("error", error.message);
   }
