@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const dbName = "db-contacts";
-
+const { authCheck } = require("./middleware/auth");
 const dbConnect = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL, {dbName});
@@ -38,6 +38,7 @@ app.use(express.json());
 
 app.use("/api/users", usersRouter);
 app.use("/api/contacts", contactsRouter);
+app.use("/api/contacts", authCheck, contactsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
