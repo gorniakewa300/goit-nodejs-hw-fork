@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const dbName = "db-contacts";
-
+const { authCheck } = require("./middleware/auth");
 const dbConnect = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL, {dbName});
@@ -22,6 +22,7 @@ const dbConnect = async () => {
 dbConnect();
 
 const contactsRouter = require("./routes/api/contacts");
+const usersRouter = require("./routes/api/users");
 
 const app = express();
 
@@ -30,12 +31,14 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(
   cors({
-    methods: ["GET", "POST", "DELETE", "PUT"],
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
   })
 );
 app.use(express.json());
 
+app.use("/api/users", usersRouter);
 app.use("/api/contacts", contactsRouter);
+app.use("/api/contacts", authCheck, contactsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
