@@ -9,6 +9,7 @@ const {
   current,
 } = require("../../models/users.js");
 const { authSchema } = require("../../middleware/validation.js");
+const { uploadMiddleware, changeAvatar } = require("../../models/changeAvatar");
 
 router.post("/signup", async (req, res, next) => {
   try {
@@ -62,4 +63,27 @@ router.get("/current", authCheck, async (req, res, next) => {
     next(error);
   }
 });
+
+router.patch(
+  "/avatars",
+  [authCheck, uploadMiddleware.single("avatar")],
+  async (req, res, next) => {
+    try {
+      const result = await changeAvatar(req.file);
+
+      if (!result) {
+        return res.status(401).json({ message: "Not authorized" });
+      }
+      const avatarUrl = await User.findOneAndUpdate(
+        { _id: req.user.id },
+        { avatarURL: result }
+      );
+
+      res.json({ avatarURL: `${result}` });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 module.exports = router;
