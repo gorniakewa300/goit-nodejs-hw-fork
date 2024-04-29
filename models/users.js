@@ -1,4 +1,3 @@
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -8,10 +7,11 @@ const gravatar = require("gravatar");
 const registration = async (body) => {
   try {
     const { email, password } = body;
+
     const user = new User({
       email,
       password: await bcrypt.hash(password, 10),
-      avatarURL: gravatar.url(email, { protocol: "http", s: 250 }),
+      avatarURL: gravatar.url(email, { protocol: "https", s: 250 }),
     });
 
     await user.save();
