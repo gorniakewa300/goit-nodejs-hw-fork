@@ -66,24 +66,9 @@ router.get("/current", authCheck, async (req, res, next) => {
 
 router.patch(
   "/avatars",
-  [authCheck, uploadMiddleware.single("avatar")],
-  async (req, res, next) => {
-    try {
-      const result = await changeAvatar(req.file);
-
-      if (!result) {
-        return res.status(401).json({ message: "Not authorized" });
-      }
-      const avatarUrl = await User.findOneAndUpdate(
-        { _id: req.user.id },
-        { avatarURL: result }
-      );
-
-      res.json({ avatarURL: `${result}` });
-    } catch (error) {
-      next(error);
-    }
-  }
+  [authCheck, uploadMiddleware.single("avatar")], 
+  changeAvatar
 );
+
 
 module.exports = router;
