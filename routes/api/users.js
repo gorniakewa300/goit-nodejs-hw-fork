@@ -9,6 +9,7 @@ const {
   current,
 } = require("../../models/users.js");
 const { authSchema } = require("../../middleware/validation.js");
+const { uploadMiddleware, changeAvatar } = require("../../models/changeAvatar");
 
 router.post("/signup", async (req, res, next) => {
   try {
@@ -62,4 +63,12 @@ router.get("/current", authCheck, async (req, res, next) => {
     next(error);
   }
 });
+
+router.patch(
+  "/avatars",
+  [authCheck, uploadMiddleware.single("avatar")], 
+  changeAvatar
+);
+
+
 module.exports = router;
