@@ -37,6 +37,9 @@ const authSchema = Joi.object({
   password: Joi.string().required(),
   subscription: Joi.string().valid("starter", "pro", "business"),
 });
+const verifySchema = Joi.object({
+  email: Joi.string().email().required(),
+});
 
 module.exports = {
   contactSchema,
@@ -44,4 +47,5 @@ module.exports = {
   favoriteShemaUpdate,
   contactIdSchema,
   authSchema,
+  verifySchema,
 };
