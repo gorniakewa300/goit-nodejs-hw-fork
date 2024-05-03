@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -22,14 +21,14 @@ const userSchema = new mongoose.Schema({
   },
   avatarURL: {
     type: String,
-    verify: {
-      type: Boolean,
-      default: false,
-    },
-    veryficationToken: {
-      type: String,
-      required: [true, "Verify token is required"],
-    },
+  },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  veryficationToken: {
+    type: String,
+    required: [true, "Verify token is required"],
   },
 });
 

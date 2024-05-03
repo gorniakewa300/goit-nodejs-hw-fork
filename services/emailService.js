@@ -18,7 +18,7 @@ const info = await transporter.sendMail({
   from: 'elektryk.pruszkow@onet.pl',
   to: userEmail,
   subject: 'verification',
-  text: `Please click the following link to verify your email http://localhost:3000/users/verify/${verificationToken}`,
+  text: `Please click the following link to verify your email http://localhost:3000/api/users/verify/${verificationToken}`,
 
 });
 console.log('Message sent: %s', info.messageId);

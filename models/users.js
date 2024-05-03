@@ -9,17 +9,15 @@ const { sendEmail } = require("../services/emailService");
 const registration = async (body) => {
   try {
     const { email, password } = body;
-
     const user = new User({
       email,
       password: await bcrypt.hash(password, 10),
       avatarURL: gravatar.url(email, { protocol: "https", s: 250 }),
       verificationToken: nanoid(),
     });
-
+    await sendEmail(user.email, user.verificationToken);
     await user.save();
     const newUser = { email: user.email, subscription: user.subscription };
-    sendEmail(user.email, user.verificationToken);
     return newUser;
   } catch (error) {
     console.log("error", error.message);
@@ -30,11 +28,9 @@ const login = async (body) => {
   try {
     const { email, password } = body;
     const findUser = await User.findOne({ email });
-   
     if (!findUser) return "Wrong email";
     if (!(await bcrypt.compare(password, findUser.password)))
       return "Wrong password";
-
     const token = jwt.sign(
       {
         _id: findUser._id,

@@ -7,9 +7,8 @@ const {
   login,
   logout,
   current,
-  verifySchema,
 } = require("../../models/users.js");
-const { authSchema } = require("../../middleware/validation.js");
+const { authSchema, verifySchema } = require("../../middleware/validation.js");
 const { uploadMiddleware, changeAvatar } = require("../../models/changeAvatar");
 const { sendEmail } = require("../../services/emailService");
 
