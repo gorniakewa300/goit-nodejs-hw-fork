@@ -5,6 +5,7 @@ const { User } = require("./User");
 const gravatar = require("gravatar");
 const {nanoid} = require('nanoid');
 const { sendEmail } = require("../services/emailService");
+
 const registration = async (body) => {
   try {
     const { email, password } = body;

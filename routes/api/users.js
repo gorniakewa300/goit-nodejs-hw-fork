@@ -11,7 +11,7 @@ const {
 } = require("../../models/users.js");
 const { authSchema } = require("../../middleware/validation.js");
 const { uploadMiddleware, changeAvatar } = require("../../models/changeAvatar");
-const { sendVerificationEmail } = require("../../services/emailService");
+const { sendEmail } = require("../../services/emailService");
 
 router.post("/signup", async (req, res, next) => {
   try {
@@ -109,7 +109,7 @@ router.post("/verify", async (req, res) => {
         .status(400)
         .json({ message: "Verification has already been passed" });
     }
-    await sendVerificationEmail(user.email, user.verificationToken);
+    await sendEmail(user.email, user.verificationToken);
     return res.status(200).json({ message: "Verification email sent" });
   } catch (error) {
     console.error("Email verification error:", error);
